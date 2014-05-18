@@ -23,6 +23,7 @@ public class Main {
 		case "add":
 			System.out.println("val: ");
 			val = scanVal.nextInt();
+			t.add(val);	
 			t.printNodes(t.root);
 			System.out.println("do you want add?");
 			changeOper(t);
