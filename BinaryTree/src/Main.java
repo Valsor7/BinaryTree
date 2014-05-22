@@ -19,20 +19,19 @@ public class Main {
 	
 	public static void changeOper(Tree t){
 		int val;
+		help();
 		switch (scanOper.nextLine()) {
 		case "add":
 			System.out.println("val: ");
 			val = scanVal.nextInt();
-			t.add(val);	
+			t.add(val);
 			t.printNodes(t.root);
-			System.out.println("do you want add?");
 			changeOper(t);
 			break;
 		case "s":
 			System.out.println("Find some val:");
 			val = scanVal.nextInt();
 			t.search(val);
-			System.out.println("do you want search again?");
 			changeOper(t);
 			break;
 		case "del":
@@ -40,7 +39,6 @@ public class Main {
 			val = scanVal.nextInt();
 			t.delete(val);
 			t.printNodes(t.root);
-			System.out.println("do you want delete again?");
 			changeOper(t);
 			break;
 		case "change":
@@ -50,8 +48,11 @@ public class Main {
 			int newVal = scanVal.nextInt();
 			t.refactor(val, newVal);
 			t.printNodes(t.root);
-			System.out.println("do you want change value again?");
 			changeOper(t);
+			break;
+		case "balance":
+			t.balance();
+			t.printNodes(t.root);
 		default:
 			changeOper(t);
 			break;
@@ -60,5 +61,7 @@ public class Main {
 	
 		
 	}
-
+	private static void help(){
+		System.out.println("COMMANDS : To add some node => add; delete node => del; refactor tree => change; \n           To search => s; For balancing the tree => balance");
+	}
 }

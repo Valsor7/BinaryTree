@@ -6,6 +6,7 @@ public class Tree {
 	Node root;
 	private int cntLeft, cntRight;
 	private int mainCnt;
+	private boolean isFirst;
 	
 	public Tree() {
 		// TODO Auto-generated constructor stub
@@ -23,13 +24,19 @@ public class Tree {
 					addNode(node.getLeft(), newNode);
 				}
 			} else {
-				if (node.getRight() == null) {
-					node.setRight(newNode);
-					node.getRight().setParent(node);
-				} else  {
-					addNode(node.getRight(), newNode);
-				}
-			} 
+				if (newNode.getValue() > node.getValue()) {
+					if (node.getRight() == null) {
+						node.setRight(newNode);
+						node.getRight().setParent(node);
+					} else  {
+						addNode(node.getRight(), newNode);
+					}
+				}	
+				if (newNode.getValue() == node.getValue()) {
+					System.out.println("already exist");
+					return;
+				}	 
+			}	
 	}
 	
 	public void add(int val){
@@ -188,72 +195,123 @@ public class Tree {
 			}
 		}
 		checkFactor(node);
-		
 	}
 	
 	private void checkFactor(Node node) {
 		// TODO Auto-generated method stub
 		int heightL = 0, heightR = 0;
 		Node main, child;
-		heightL = getHeight(node.getLeft());
-		heightR = getHeight(node.getRight());
+		heightL = getHeight(node.getLeft(), true);
+		heightR = getHeight(node.getRight(), true);
+	
 		if ((heightL - heightR) > 1) {
-			//rotate // check left or right
-			child = node.getLeft();
-			main = node.getLeft().getRight();
-			if (getHeight(node.getLeft().getLeft()) - getHeight(node.getLeft().getRight()) == -1) {
+			if (getHeight(node.getLeft().getLeft(), true) - getHeight(node.getLeft().getRight(), true) == -1) {
+				child = node.getLeft();
+				main = node.getLeft().getRight();
 				main.setParent(node);
 				child.setParent(main);
 				child.setRight(main.getLeft());
-				child.getRight().setParent(child);
+				if(child.getRight() != null){
+					child.getRight().setParent(child);
+				}
 				node.setLeft(main);
 				node.getLeft().setLeft(child);
-			} else {
-				if (node == root) {
-			
-				} else {
-					if (node.getParent().getLeft() == node) {
-						main.setParent(node.getParent());
-						node.setLeft(main.getRight());
-						main.getRight().setParent(node);
-						main.setRight(node);
-						main.setLeft(child);
-						node.getParent().setLeft(main);
-					} else {
-						if (node.getParent().getRight() == node) {
-						//	node.getParent().setRight(replaceNode);
-						}	
-					}
-				}
-				
 			}
+			
+			if (node == root) {
+				main = node.getLeft();
+				main.setParent(null);
+				node.setLeft(main.getRight());
+				if (main.getRight() != null) {
+					main.getRight().setParent(node);
+				}
+				main.setRight(node);
+				root = main;
+				node.setParent(main);
+			} else {
+				main = node.getLeft();
+				main.setParent(node.getParent());
+				node.setLeft(main.getRight());
+				if (main.getRight() != null) {
+					main.getRight().setParent(node);
+				}
+				main.setRight(node);
+				if (node.getParent().getLeft() == node) {node.getParent().setLeft(main);} 
+				else {
+					if (node.getParent().getRight() == node) {node.getParent().setRight(main);}	
+				}
+				node.setParent(main);
+			}	
 		} else {
 			if ((heightL - heightR) < -1) {
-			//	rotate // check left or right 
+				if (getHeight(node.getRight().getLeft(), true) - getHeight(node.getRight().getRight(), true) == 1) {
+				child = node.getRight();
+				main = node.getRight().getLeft();
+				main.setParent(node);
+				child.setParent(main);
+				child.setLeft(main.getRight());
+				if(child.getLeft() != null){
+					child.getLeft().setParent(child);
+				}
+				node.setRight(main);
+				node.getRight().setRight(child);
+				}
+				if (node == root) {
+					main = node.getRight();
+					main.setParent(null);
+					node.setRight(main.getLeft());
+					if (main.getLeft() != null) {
+						main.getLeft().setParent(node);
+					}
+					main.setLeft(node);
+					root = main;
+					node.setParent(main);
+				} else {
+					main = node.getRight();
+					main.setParent(node.getParent());
+					node.setRight(main.getLeft());
+					if (main.getLeft() != null) {
+						main.getLeft().setParent(node);
+					}
+					main.setLeft(node);
+					if (node.getParent().getLeft() == node) {node.getParent().setLeft(main);} 
+					else {
+						if (node.getParent().getRight() == node) {node.getParent().setRight(main);}	
+					}
+					node.setParent(main);
+				}	
 			}
-		}
+		}	
+		
 	}
 	
 	
 	
-	private int getHeight(Node node){
+	private int getHeight(Node node, boolean isFirst){
 		int cntL = 0, cntR = 0, cnt = 0;
 		if (node == null) {
 			return 0;
 		}
+		if (node != null) {
+			if (isFirst) {
+			cnt++;
+			isFirst = false;
+		}
+		}
+		
 		if (node.getLeft() != null && node.getRight() != null) {
 			cntL++;
-			cntL += getHeight(node.getLeft());
+			cntL += getHeight(node.getLeft(), isFirst);
 			cntR++;
-			cntR += getHeight(node.getRight());
+			cntR += getHeight(node.getRight(), isFirst);
 		} else {
 			if (node.getLeft() != null) {
 				cntL++;
-				cntL += getHeight(node.getLeft());
+				cntL += getHeight(node.getLeft(), isFirst);
 			} else {
 				if (node.getRight() != null) {
 					cntR++;
-					cntR += getHeight(node.getRight());
+					cntR += getHeight(node.getRight(), isFirst);
 				}
 			}
 			
@@ -291,14 +349,14 @@ public class Tree {
 			return;
 		}
 		if (node.getLeft() != null) {
-			l = node.getLeft().getValue() + "[id=" + node.getLeft().getId() + "]" + " <= ";
+			l = node.getLeft().getValue() + "[id=" + node.getLeft().getId() + ", " + node.getLeft().getDate() + "]" + " <= ";
 		} 
 		
 		if (node.getRight() != null) {
-			r = " => " + node.getRight().getValue() + "[id=" + node.getRight().getId() + "]";
+			r = " => " + node.getRight().getValue() + "[id=" + node.getRight().getId() + ", " + node.getRight().getDate() + "]";
 		}
 		if ((node.getRight() != null || node.getLeft() != null) || node == root ) {
-			System.out.println(l + node.getValue() + "[id=" + node.getId() + "]" + r);
+			System.out.println(l + node.getValue() + "[id=" + node.getId() + ", " + node.getDate() + "]" + r);
 			System.out.println();
 			printNodes(node.getLeft());
 			printNodes(node.getRight());
